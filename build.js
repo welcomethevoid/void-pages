@@ -25,6 +25,10 @@ const CONTENT_DIR = process.env.CONTENT_DIR || path.resolve(__dirname, '../void-
 const OUTPUT_DIR  = process.env.OUTPUT_DIR  || path.resolve(__dirname, 'dist');
 const ASSETS_DIR  = path.resolve(__dirname, 'assets');
 
+// GitHub Pages sirve el sitio en /{repo-name}/ — hay que usar paths relativos
+// Para uso local o dominio custom, dejar BASE_PATH vacío
+const BASE_PATH = process.env.BASE_PATH || '';
+
 const NOTES_DIR     = path.join(CONTENT_DIR, 'notas');
 const NOTEBOOKS_DIR = path.join(CONTENT_DIR, 'cuadernos');
 const CONFIG_FILE   = path.join(CONTENT_DIR, '_config', 'materias.json');
@@ -232,7 +236,7 @@ function renderSidebarTree(node, basePath, activeNotePath = '', depth = 0) {
   }
 
   for (const note of node.notes) {
-    const href    = `${basePath}/${note.uuid}/`;
+    const href    = `${BASE_PATH}${basePath}/${note.uuid}/`;
     const isActive = activeNotePath === href;
     html += `
       <a class="tree-leaf ${isActive ? 'active' : ''}"
@@ -243,7 +247,7 @@ function renderSidebarTree(node, basePath, activeNotePath = '', depth = 0) {
   }
 
   for (const nb of node.notebooks) {
-    const href = `${basePath}/${nb.slug}/`;
+    const href = `${BASE_PATH}${basePath}/${nb.slug}/`;
     html += `
       <a class="tree-leaf notebook-leaf ${activeNotePath === href ? 'active' : ''}"
          style="padding-left:${22 + indent}px"
@@ -290,15 +294,15 @@ function htmlShell({ title, sidebar, toc = '', content, bodyClass = '' }) {
 <title>${escapeHtml(title)} — VOID Apuntes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="${BASE_PATH}/assets/style.css">
 </head>
 <body class="${bodyClass}">
 
 <header class="topbar">
   <div class="topbar-left">
-    <a href="/" class="topbar-brand">VOID<span>//</span>APUNTES</a>
+    <a href="${BASE_PATH}/" class="topbar-brand">VOID<span>//</span>APUNTES</a>
     <nav class="topbar-nav">
-      <a href="/">ÍNDICE</a>
+      <a href="${BASE_PATH}/">ÍNDICE</a>
     </nav>
   </div>
   <div class="topbar-right">
@@ -314,7 +318,7 @@ function htmlShell({ title, sidebar, toc = '', content, bodyClass = '' }) {
 
 ${toc}
 
-<script src="/assets/script.js"></script>
+<script src="${BASE_PATH}/assets/script.js"></script>
 </body>
 </html>`;
 }
@@ -326,7 +330,7 @@ function generateIndex(materias) {
     const tree  = buildTree(path.join(NOTES_DIR, slug), slug);
     const count = countAll(tree);
     return `
-      <a class="subject-card" href="/${slug}/">
+      <a class="subject-card" href="${BASE_PATH}/${slug}/">
         <div class="subject-id">// ${String(i + 1).padStart(2, '0')}</div>
         <div class="subject-name">${escapeHtml(name)}</div>
         <div class="subject-stats">${count} notas</div>
@@ -371,7 +375,7 @@ function generateSubjectPage(slug, name, tree, materias) {
       const tags = (note.meta.tags || []).map(t =>
         `<span class="tag">${escapeHtml(t)}</span>`).join('');
       html += `
-        <a class="note-item" href="/${slug}/${note.uuid}/">
+        <a class="note-item" href="${BASE_PATH}/${slug}/${note.uuid}/">
           <div>
             <div class="note-date">${note.meta.updated || note.meta.created || ''}</div>
             <div class="note-title">${escapeHtml(note.name)}</div>
@@ -384,7 +388,7 @@ function generateSubjectPage(slug, name, tree, materias) {
 
     for (const nb of node.notebooks) {
       html += `
-        <a class="note-item" href="/${slug}/${nb.slug}/">
+        <a class="note-item" href="${BASE_PATH}/${slug}/${nb.slug}/">
           <div>
             <div class="note-date">${nb.meta.updated || ''}</div>
             <div class="note-title">✎ ${escapeHtml(nb.name)}</div>
@@ -399,7 +403,7 @@ function generateSubjectPage(slug, name, tree, materias) {
 
   const content = `
     <div class="page-header">
-      <div class="breadcrumb"><a href="/">VOID // APUNTES</a> // <span>${escapeHtml(name)}</span></div>
+      <div class="breadcrumb"><a href="${BASE_PATH}/">VOID // APUNTES</a> // <span>${escapeHtml(name)}</span></div>
       <h1 class="page-title">${escapeHtml(name.toUpperCase())}</h1>
       <div class="page-meta">${countAll(tree)} notas publicadas</div>
     </div>
@@ -420,10 +424,10 @@ function generateNotePage(note, subjectSlug, subjectName, materias) {
   const tags = (note.meta.tags || []).map(t =>
     `<span class="tag highlight">${escapeHtml(t)}</span>`).join('');
 
-  const notePath = `/${subjectSlug}/${note.uuid}/`;
+  const notePath = `${BASE_PATH}/${subjectSlug}/${note.uuid}/`;
 
   const content = `
-    <a class="backlink" href="/${subjectSlug}/">← ${escapeHtml(subjectName)}</a>
+    <a class="backlink" href="${BASE_PATH}/${subjectSlug}/">← ${escapeHtml(subjectName)}</a>
     <div class="note-header">
       <div class="note-header-meta">
         <span class="subject-pill">${escapeHtml(subjectName.toUpperCase())}</span>
@@ -459,7 +463,7 @@ function generateNotebookPage(notebook, subjectSlug, subjectName, materias) {
   const commits = getCommitHistory(relPath);
 
   const content = `
-    <a class="backlink" href="/${subjectSlug}/">← ${escapeHtml(subjectName)}</a>
+    <a class="backlink" href="${BASE_PATH}/${subjectSlug}/">← ${escapeHtml(subjectName)}</a>
     <div class="note-header">
       <div class="note-header-meta">
         <span class="subject-pill">${escapeHtml(subjectName.toUpperCase())}</span>
@@ -480,7 +484,7 @@ function generateNotebookPage(notebook, subjectSlug, subjectName, materias) {
       <button class="lb-btn lb-next" onclick="event.stopPropagation(); moveLightbox(1)">→</button>
     </div>`;
 
-  const sidebar = renderSidebar(materias, subjectSlug, `/${subjectSlug}/${notebook.slug}/`);
+  const sidebar = renderSidebar(materias, subjectSlug, `${BASE_PATH}/${subjectSlug}/${notebook.slug}/`);
   return htmlShell({ title: notebook.name, sidebar, content });
 }
 
@@ -499,7 +503,7 @@ function buildSearchIndex(materias) {
           subject: subjectName,
           tags:    note.meta.tags || [],
           excerpt: note.content.slice(0, 200).replace(/[#*`]/g, ''),
-          url:     `/${subjectSlug}/${note.uuid}/`
+          url:     `${BASE_PATH}/${subjectSlug}/${note.uuid}/`
         });
       }
       for (const folder of node.folders) walk(folder.children, subjectSlug, subjectName);
