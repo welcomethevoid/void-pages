@@ -267,7 +267,7 @@ body::before {
 /* ── SUBJECTS GRID ── */
 .subjects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: var(--border);
 }
@@ -612,6 +612,25 @@ body::before {
 .lb-btn:hover { border-color: var(--muted); color: var(--text); }
 .lb-prev { left: 32px; }
 .lb-next { right: 32px; }
+
+/* ── MERMAID ── */
+.mermaid-diagram {
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent !important;
+}
+
+/* ── KATEX ── */
+.katex-display {
+  margin: 24px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.katex { font-size: 1.1em; }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 3px; }
