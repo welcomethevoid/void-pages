@@ -295,6 +295,7 @@ function htmlShell({ title, sidebar, toc = '', content, bodyClass = '' }) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="${BASE_PATH}/assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 </head>
 <body class="${bodyClass}">
 
@@ -319,6 +320,50 @@ function htmlShell({ title, sidebar, toc = '', content, bodyClass = '' }) {
 ${toc}
 
 <script src="${BASE_PATH}/assets/script.js"></script>
+
+<!-- KaTeX -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false }
+    ]
+  })">
+</script>
+
+<!-- Mermaid -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    themeVariables: {
+      background: '#000000',
+      primaryColor: '#1a1a1a',
+      primaryTextColor: '#A8B0BC',
+      primaryBorderColor: '#222222',
+      lineColor: '#444C58',
+      secondaryColor: '#0a0a0a',
+      tertiaryColor: '#000000',
+      edgeLabelBackground: '#000000',
+      fontFamily: 'JetBrains Mono, monospace'
+    }
+  });
+
+  // Convertir bloques <code class="language-mermaid"> en diagramas
+  document.querySelectorAll('pre code.language-mermaid').forEach(async (el) => {
+    const pre = el.parentElement;
+    const definition = el.textContent;
+    const id = 'mermaid-' + Math.random().toString(36).slice(2);
+    const { svg } = await mermaid.render(id, definition);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mermaid-diagram';
+    wrapper.innerHTML = svg;
+    pre.replaceWith(wrapper);
+  });
+</script>
+
 </body>
 </html>`;
 }
